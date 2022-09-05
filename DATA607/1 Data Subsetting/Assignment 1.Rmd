@@ -1,0 +1,69 @@
+---
+title: 'Assignment 1: Data Subsetting'
+author: "Keeno Glanville"
+date: "2022-09-04"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+library(tidymodels)
+library(readr)
+
+```
+
+
+# Introduction
+I am opting to go with the FIFA data set. https://fivethirtyeight.com/features/how-to-break-fifa/
+I chose this data set as it gives insightful info as to the participation of countries to the
+FIFA world cup viewership. This is insightful as it demonstrates the strength of viewership in
+each area and could be used to group FIFA relations and outreach by continents.
+The Business Problem I want to take is Outreach to areas that do not watch the World Cup. FIFA
+officials were indicted for bribery of the rights to host the world cup competitions.
+
+
+## Reading dataset into R
+```{r cars}
+urldata="https://raw.githubusercontent.com/kglan/MSDS/main/DATA607/1%20Data%20Subsetting/FIFAData"
+FIFAdata<-read_csv(url(urldata))
+names(FIFAdata)
+```
+
+## We will now Subset the data to a new data frame which illustrates the Data of Region with its relation to Global Population and FIFA Viewership
+
+
+```{r}
+FIFAdata <- FIFAdata%>%
+  select(-"gdp_weighted_share", -"country")%>%
+  rename(Region = "confederation",
+         "Global_Population(%)" = "population_share",
+         "FIFA_Total_Viewer(%)"= "tv_audience_share")
+```
+
+Here we have a dataset which tells us the Region as well as the percentage of
+individuals from each country in that region watch the World Cup
+
+
+# New Data Frame consisting of Region 
+
+```{r}
+
+
+FIFAtargets <- aggregate(cbind(`Global_Population(%)`,`FIFA_Total_Viewer(%)`) ~ Region,
+                             data = FIFAdata,
+                             FUN = sum)
+FIFAtargets
+```
+
+
+# Conclusion
+Seeing as FIFA gave the right to QATAR to host the 2022 FIFA World Cup, we could
+make the argument that they are aiming to target regions whose FIFA viewage 
+percentage is lower than the Global Population percentage.This could be seen as
+CAF and AFC has the only negative ratio.
+The counter-argument to their indictment is that they could have given that right
+to any country within the AFC region as they have the largest Global Population
+as well as the highest percentage of viewership for FIFA. This is all whilst 
+having a negative viewership ratio
+
