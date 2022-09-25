@@ -1,0 +1,150 @@
+---
+title: "DATA607 Project 1"
+author: "Keeno Glanville"
+date: "9/24/2022"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r setup, include=FALSE}
+
+library(tidymodels)
+library(readr)
+library(dplyr)
+library(stringr)
+```
+
+# Read data into R
+
+```{r cars}
+urldata="https://raw.githubusercontent.com/kglan/MSDS/main/DATA607/Project%201/tournamentinfo.txt"
+chessdata<-read.csv(url(urldata))
+view(chessdata)
+```
+
+# Clean Data
+ 
+When you examine the data we see two things. Variables in rows 1 and 2 that 
+we know but do not need. So what we will do now is remove those rows. Upon 
+removing these columns we see that there is a pattern available to extract our
+data using a sequence to separate the player data and rating data 
+
+```{r}
+
+
+
+chessdataWIP <- chessdata[-c(1:2),]
+playerdata<-chessdataWIP[seq(2, length(chessdataWIP), 3)]
+ratingdata<-chessdataWIP[seq(3, length(chessdataWIP), 3)]
+chessdataWIP
+playerdata
+ratingdata
+```
+
+# Further subset of data
+
+So we now have the basic setup that we need with the data. Now it's time to 
+extract the relevant information we want from the new subsets we just created. 
+In this section I will utilize regular expression learnt from classes before.
+
+
+
+## For extracting the player names we will use the regular expression commands to search for the names using a pattern
+
+```{r}
+
+Name <- str_trim(str_extract(playerdata,"(\\w+\\s){2,4}"))
+Name
+```
+
+## Now we extract the total Points which is easy because it is a two digit decimal however we have to turn it to a numeric value as it is still in a string 
+
+
+
+
+```{r}
+Points <- as.numeric(str_extract(playerdata, "\\d.\\d"))
+Points
+```
+
+## We do the same for the opponents of our candidates using the extract all function
+
+```{r}
+
+Opponent <- str_extract_all(str_extract_all(playerdata,"\\d+\\|"), "\\d+")
+Opponent
+
+
+```
+## Now we want to extract the ratings of the players before the game and state they were in
+
+
+
+```{r}
+
+ratingbefore <- as.integer(str_extract(str_extract(ratingdata, "\\D\\d{3,4}\\D"), "\\d+")) 
+State <- str_extract(ratingdata, "\\w\\w")
+ratingbefore
+State
+
+```
+
+## The tricky part to this section is to average the player ratings of all the opponents. To accompliah this we could manually go through each iteration and calculate each player's oppenent but the easier way would to create an unique ID column for each player and have a for loop that goes through this for us automatically.
+
+Since we know there are 64 instances we need a unique ID column for players
+
+
+```{r}
+
+ID <- c(1:64)
+
+avgratingbefore<- length(playerdata)
+for (x in 1:length(playerdata)){
+  avgratingbefore[x]<- round(mean(ratingbefore[as.numeric(unlist(Opponent[ID[x]]))]), digits = 0)
+}
+
+avgratingbefore
+
+
+```
+
+
+## Now we have all necessary datapoints to complete the assignment. Now all we must do is essentially create a dataframe of all the new variables we filtered
+
+
+
+```{r}
+Matchdata<- data.frame(Name, State, Points, ratingbefore, avgratingbefore)
+
+Matchdata
+
+
+```
+
+## Now we create an export to the csv file.
+
+```{r}
+
+write.table(Matchdata, file = "ChessTournament.csv", row.names=FALSE, na="", col.names=TRUE, sep=",")
+
+
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
