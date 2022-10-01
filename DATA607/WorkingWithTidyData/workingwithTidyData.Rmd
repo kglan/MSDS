@@ -1,0 +1,86 @@
+---
+title: "Working with Tidy Data"
+author: "Keeno Glanville"
+date: "2022-10-01"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(tidyr)
+library(dplyr)
+```
+
+## load CSV file and Clean data
+
+
+```{r}
+
+
+
+url <- "https://raw.githubusercontent.com/kglan/MSDS/main/DATA607/WorkingWithTidyData/WorkingwithTidyData.csv"
+rawdata <-read.csv(url)
+rawdata <- t(rawdata)
+rawdata<- data.frame(rawdata)
+rownames(rawdata)<- c()
+rawdata
+names(rawdata)
+rownames(rawdata)
+data <- rawdata%>%
+  select(-3,)%>%
+  slice(-c(1,2))%>%
+  mutate_if(is.character, as.numeric)%>%
+  t()%>%
+  data.frame()%>%
+  mutate("Total" = X1 + X2 +X3 + X4 + X5)%>%
+  t()%>%
+  data.frame()%>%
+  rename("ALASKA on Time" = "X1",
+         "ALASKA delayed" = "X2",
+         "AM_WEST on Time" = "X4",
+         "AM_WEST delayed "= "X5")
+
+row.names(data) <- c("Los Angeles", "Phoenix", "San Diego", "San Francisco", "Seattle", "Total")
+data
+
+```
+
+## Now that data is clean we will conduct Analysis 
+When we compare both airlines we see that the ALASKA airline has fewer delays
+within their flights. It is significant to note that The ALASKA airline has less
+flights total which shows that with such a magnitude of flights AM_WEST is still
+close in comparison.
+
+```{r}
+
+airline<- data%>%
+  mutate("ALASKA total_flights"= `ALASKA delayed`+`ALASKA on Time`)%>%
+  mutate("AM_WEST total_flights"= `AM_WEST delayed `+ `AM_WEST on Time`)%>%
+  mutate("ALASKA total_delays"= `ALASKA delayed`/(`ALASKA on Time`+`ALASKA delayed`))%>%
+  mutate("AM_WEST total_delays"= `AM_WEST delayed `/(`AM_WEST on Time`+`AM_WEST delayed `))%>%
+  round(digits = 2)
+
+airline
+           
+```
+
+
+
+# Visualization
+```{r}
+library(ggplot2)
+airline$City<- c("Los Angeles","Phoenix", "San Diego", "San Francisco", "Seattle", "Total")
+ggplot(airline, aes(x=City, y=`ALASKA total_delays`)) +
+  geom_bar(position='dodge', stat='identity')
+ggplot(airline, aes(x=City, y= `AM_WEST total_delays`)) +
+  geom_bar(position=position_dodge(), stat='identity')
+```
+
+# Conclusion
+
+When looking at the data in in the bar graphs, we see that AM_WEST has a high
+delay rate in San Francisco and Seattle which skew its delay rate with these two
+cities. When looking at ALASKA it shows that the delay rates are relatively 
+similar amongst the cities besides Phoenix and San Diego. This implies that 
+AM_WEST needs to focus on fixing the reasons it has such high delays in San 
+Francisco and Seattle.
