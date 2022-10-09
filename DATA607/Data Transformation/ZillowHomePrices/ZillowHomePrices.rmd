@@ -1,0 +1,64 @@
+---
+title: "Zillow Single Family Home Prices"
+author: "Keeno Glanville"
+date: "2022-10-09"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+set.seed(1324)
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+```
+
+# Determine if the average price of a house in NY is decreasing or increasing compared to one year ago.  Will involve turning the months/years into a long format.
+
+## Load data
+```{r}
+urldat <- "https://raw.githubusercontent.com/kglan/MSDS/main/DATA607/Data%20Transformation/ZillowHomePrices/ZillowHomeprices.csv"
+zill<- read_csv(url(urldat))
+zill
+```
+
+# Wide data brought to Long
+## Clean and downsize data
+( A problem arose where some of the data had NA values, those rows without accurate and conssiten reporting data were removed)
+```{r}
+
+zill <- filter(zill, State == "NY")
+zill<- zill%>%
+  na.omit()%>%
+  select(c(250:281))
+
+
+
+#Find sum on columns
+price<-colMeans(zill)
+
+#Establish Long data view
+zillowNY <- data.frame(price)
+zillowNY$Date <- row.names(zillowNY)
+rownames(zillowNY) <- 1:nrow(zillowNY)
+
+
+zillowNY 
+
+```
+
+# Now we do a ggplot to see the trend of House Prices over the year
+
+
+
+```{r}
+ggplot(zillowNY, aes(x=Date, y= price))+
+  geom_point()+
+  geom_line()+
+  theme(axis.text.x = element_text(angle = 60, hjust = 1))
+```
+
+# Conclusion
+
+## We see that house prices in New York have been strongly rising from the previous year to now.
