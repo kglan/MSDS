@@ -1,0 +1,68 @@
+---
+title: "CyberThreats"
+author: "Keeno Glanville"
+date: "2022-10-10"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+library(rvest)
+
+
+```
+
+# Analysis: Compare the frequency of cyber crime in each year.
+## Load Data
+```{r}
+urldata<- "https://raw.githubusercontent.com/kglan/MSDS/main/DATA607/Data%20Transformation/Cyber%20Threats/cyberthreats.csv"
+nbad<- read_csv(url(urldata))
+nbad
+```
+
+
+
+## Combine the different forms of cyber threats into one
+```{r}
+nbad <- nbad%>%
+  mutate("Total Threats" = Adware + Backdoor + Ransomware + Trojan)
+
+nba<- nbad%>%
+  select(c(1,6))
+nba
+```
+
+
+
+
+
+## Now we perform the requested analysis on the threats oper year
+
+```{r}
+
+ggplot(nba, aes(x= Year, y= `Total Threats`))+
+  geom_point()+
+  geom_line()
+  
+          
+
+
+```
+
+
+# Conclusion
+
+## We see here that the amount of Cyber threats fluctuates per year based on the custom dataset profided by classmate.
+
+
+
+
+
+
+
+
+
