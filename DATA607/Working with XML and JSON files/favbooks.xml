@@ -1,0 +1,72 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<!DOCTYPE article>
+<article xml:lang="en">
+    <info>
+    <title>Favorite Books</title>
+  </info>
+  <para>
+    <emphasis role="strong">Favorite Books</emphasis>
+  </para>
+  <table>
+      <thead>
+        <row>
+          <entry>
+            Title
+          </entry>
+          <entry>
+            Year
+          </entry>
+          <entry>
+            Author
+          </entry>
+          <entry>
+            Publisher
+          </entry>
+        </row>
+      </thead>
+      <tbody>
+        <row>
+          <entry>
+            R for Data Science
+          </entry>
+          <entry>
+            2017
+          </entry>
+          <entry>
+            Garrett Grolemund, Hadley Wickham
+          </entry>
+          <entry>
+            O'Reilly Media
+          </entry>
+        </row>
+        <row>
+          <entry>
+            Think Python
+          </entry>
+          <entry>
+            2002
+          </entry>
+          <entry>
+            Allen B. Downey
+          </entry>
+          <entry>
+            O'Reilly Media
+          </entry>
+        </row>
+        <row>
+          <entry>
+            High-Frequency Trading
+          </entry>
+          <entry>
+            2013
+          </entry>
+          <entry>
+            Irene Aldridge
+          </entry>
+          <entry>
+            Wiley
+          </entry>
+        </row>
+      </tbody>
+  </table>
+</article>
