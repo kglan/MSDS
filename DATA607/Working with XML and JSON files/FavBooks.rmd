@@ -1,0 +1,55 @@
+---
+title: "DATA607 Working with XML and JSON "
+author: "Keeno Glanville"
+date: "10/14/2022"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+
+library(XML)
+library(rvest)
+library(RCurl)
+library(rjson)
+
+```
+
+# Read XML
+
+```{r}
+xml.url<-"https://raw.githubusercontent.com/kglan/MSDS/main/DATA607/Working%20with%20XML%20and%20JSON%20files/favbooks.xml"
+xData <- getURL(xml.url)
+XML_df <- xmlToDataFrame(xData)
+XML_df
+
+
+
+```
+
+# Read HTML
+
+```{r}
+html.url <- "https://raw.githubusercontent.com/kglan/MSDS/main/DATA607/Working%20with%20XML%20and%20JSON%20files/favbooks.html"
+hData <- read_html(html.url)
+HTML_df <- hData%>%
+  html_nodes("table")%>%
+  html_table()%>% .[[1]]
+HTML_df
+```
+
+#Read JSON file
+
+
+```{r}
+json.url<- "https://raw.githubusercontent.com/kglan/MSDS/main/DATA607/Working%20with%20XML%20and%20JSON%20files/favbooks.json"
+jData <- fromJSON(file=json.url)
+#jData <- (fromJSON(paste(readLines(json.url))))
+JSON_df <- as.data.frame(jData)
+JSON_df
+```
+
+
+# Conclusion
+All the data frames can be input the same if they are formatted and loaded properly
