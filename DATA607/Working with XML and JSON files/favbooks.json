@@ -1,24 +1,6 @@
 {
-
-    "Favorite Books": [
-        
-        {
-            "Title": "R or Data Science",
-            "Year": 2017,
-            "Author": "Garrett Grolemund, Hadley Wickham",
-            "Publisher": "O'Reilly Media" 
-        },
-        {
-            "Title": "Think Python",
-            "Year": 2002,
-            "Author": "Allen B. Downey",
-            "Publisher": "O'Reilly Media"
-        },
-        {
-            "Title": "High-Frequency Trading"  ,
-            "Year": 2013 ,
-            "Author": "Irene Aldridge",
-            "Publisher": "Wiley"
-        } 
-    ]
+    "Title": ["R or Data Science", "Think Python", "High-Frequency Trading"],
+    "Year": [2017, 2002, 2013],
+    "Author": ["Garrett Grolemund, Hadley Wickham", "Allen B. Downey", "Irene Aldridge"],
+    "Publisher": ["O'Reilly Media", "O'Reilly Media", "Wiley"]
 }
