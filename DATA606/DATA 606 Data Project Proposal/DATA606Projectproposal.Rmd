@@ -1,0 +1,109 @@
+---
+title: "DATA 606 Data Project Proposal"
+author: "Keeno Glanville"
+date: "2022-10-23"
+output: html_document
+---
+
+### Data Preparation
+
+```{r setup, echo=TRUE, results='hide', warning=FALSE, message=FALSE}
+# load data
+library(ggplot2)
+library(corrplot)
+library(manifestoR)
+library(readr)
+library(dplyr)
+url.test<-"https://raw.githubusercontent.com/kglan/MSDS/main/DATA606/DATA%20606%20Data%20Project%20Proposal/test.csv"
+testdata <- read_csv(url(url.test))
+
+
+url.train <- "https://raw.githubusercontent.com/kglan/MSDS/main/DATA606/DATA%20606%20Data%20Project%20Proposal/train.csv"
+traindata <- read_csv(url(url.train))
+
+df<- bind_rows(traindata, testdata)
+
+#Categorical Vairables
+cat_features <- df%>%
+  select(5,6,8,9,10,12,13,14,16,17,18,20,21)%>%
+  colnames()%>%
+  as.vector()%>%
+  append("bankruptcy")
+cat_features
+
+#Numerical Variables
+num_features <-df%>%
+  select(2,3,4,7,11,15,19)%>%
+  colnames()%>%
+  as.vector()
+num_features
+
+corrro <-df%>%
+  select(2,3,4,7,11,15,19) 
+```
+```{r}
+df
+```
+
+### Research question 
+ Using a Logistic Regression, what is the likelihood that the individuals within the testdata set will have a bankruptcy?
+
+
+
+### Cases 
+
+Each case represents individuals who have utilized American Express as their financial institution. There are 1000 observations
+
+
+
+### Data collection 
+
+The Data was Collected by American Express as a part of their coding competition hosted on Kaggle.com. The Data is utilized as a method of improving analytical skills
+
+
+
+### Type of study 
+ This is an observational study
+
+
+
+### Data Source 
+
+https://www.kaggle.com/competitions/bankruptcy-risk-prediction/data?select=train.csv
+
+
+
+### Dependent Variable
+
+The response variable is bankruptcy, it is binary categorical
+
+
+
+### Independent Variable(s)
+There are many explanatory variables which contribute to this dataset as many factors could contribute. The magnitude of the factors which contribute will be explored in the Analysis and Logistic Regression model. 
+
+
+
+### Relevant summary statistics 
+
+**Provide summary statistics for each the variables. Also include appropriate visualizations related to your research question (e.g. scatter plot, boxplots, etc). This step requires the use of R, hence a code chunk is provided below. Insert more code chunks as needed.**
+
+```{r}
+summary(df)
+
+ggplot(df, aes(x=sum)) + 
+  geom_histogram()
+
+#Demonstrate correlation between numerical values
+library(corrplot)
+Tracefile_cor <- cor(corrro, method = "pearson")
+col <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+corrplot(Tracefile_cor, method = "color", col = col(200),
+         type = "upper", order = "hclust",
+         addCoef.col = "black",
+         tl.col = "black", tl.srt = 45,)
+
+
+      
+
+```
