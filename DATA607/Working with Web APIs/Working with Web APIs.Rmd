@@ -1,0 +1,33 @@
+---
+title: "Working with Web APIs"
+author: "Keeno Glanville"
+date: "2022-10-30"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(httr)
+library(jsonlite)
+library(DT)
+library(tidyverse)
+```
+
+## Setup url and API key
+```{r}
+url <- 'https://api.nytimes.com/svc/books/v3/lists/current/hardcover-fiction.json'
+api <- 'GUz2FMGJsWSqNi5ZC8ZGDAUkqoscMzAI'
+
+bookurl <- paste(url,'?api-key=',api, sep = '')
+```
+
+
+
+# Change data from list to Dataframe
+```{r}
+booksrough <- fromJSON(bookurl, flatten = TRUE)
+books <- data.frame(booksrough$results$books)
+View(books)
+books <- books%>%
+  select(1,3,11,12,8)
+books
+```
