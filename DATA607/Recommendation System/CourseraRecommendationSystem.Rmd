@@ -1,0 +1,53 @@
+---
+title: "Coursera Recommendation System"
+author: "Keeno Glanville"
+date: "2022-11-07"
+output: html_document
+---
+
+# Coursera Recommendation System
+
+
+
+## Background:
+
+Coursera is an educational platoform that individuals utilize to gain knowledge 
+on various topics of their choosing. It has become a strong tool in certification
+and many individuals utilizes its resources to gain career changing knowledge
+
+
+### Who are your target users?
+
+Individuals that desire to learn.
+
+
+
+### What are their key goals?
+
+The key goal of these customers is to gain knowledge on topics that they
+previously lacked any understanding. They utilize the platform to extend their education
+
+### How can you help them accomplish those goals
+
+This could be done by ensuring that they have the smoothest transitions within the website.
+It is also accomplished by ensuring all courses are thorough and their introduction concise.
+This ensures that they know what exactly a course will teach them before joining.
+
+
+### Reverse Engineering
+
+Coursera utilizes a Hybrid Recommendation System. This is due to the fact that they 
+are using both content-based and collaborative filtering. 
+Content-based: Within Coursera you have the ability to set up your preferences for the
+types of courses you want to see within your environment.
+Collaborative filtering: Coursera also recommends you courses based on the searches
+as well as classes that you do. The will often label it within a certain category
+and utilize that cluster to aid you. 
+
+### Suggestions for possible improvement
+
+For an improvement within Coursera's system I would opt that they create a UI recommendation
+system that shows you roadmaps towards careers you could achieve based on the courses you
+are taking. This way no one feel's like the information they gain is useless. This
+could motivate users to enroll in all the courses that push them towards their goals
+in the road map.
