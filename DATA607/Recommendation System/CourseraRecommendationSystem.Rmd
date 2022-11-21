@@ -57,8 +57,9 @@ Data Engineer roles.
 
 ### Reverse Engineering
 
-Coursera utilizes a Hybrid Recommendation System. This is due to the fact that they 
-are using both content-based and collaborative filtering. 
+While it is unclear exactly what recommendation system Coursera utilizes. 
+I have an idea from personal that they use a Hybrid Recommendation System (Source 3). 
+This is due to the fact that they are using both content-based and collaborative filtering. 
 Content-based: Within Coursera you have the ability to set up your preferences for the
 types of courses you want to see within your environment.
 Collaborative filtering: Coursera also recommends you courses based on the searches
@@ -99,3 +100,6 @@ https://www.coursera.org/specializations/recommender-systems#courses
 
 Source2
 https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0204849
+
+Source3
+https://www.coursera.support/s/article/929742317-Check-and-Update-Your-Email-Communication-Preferences?
