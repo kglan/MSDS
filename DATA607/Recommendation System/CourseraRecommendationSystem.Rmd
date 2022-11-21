@@ -13,25 +13,46 @@ output: html_document
 
 Coursera is an educational platoform that individuals utilize to gain knowledge 
 on various topics of their choosing. It has become a strong tool in certification
-and many individuals utilizes its resources to gain career changing knowledge
-
+and many individuals utilizes its resources to gain career changing knowledge. The
+reason I chose this platform system is due to my personal experience. Coursera is 
+a marvelous tool for those who want to pursue careers in tech. There are an abundance 
+of courses that have helped me immensely in my journey.
+```{r echo=FALSE, out.width= "100%"}
+library(cowplot)
+knitr::include_graphics("coursera.jpg", error = FALSE)
+```
 
 ### Who are your target users?
 
-Individuals that desire to learn.
+Young adults tend to be the target audience for Coursera because it is a developmental
+platform. Young adults trying career enhancements or pivots will utilize this application
+to gain as much skill as they can. This is significant because desire of knowledge 
+never really stops it just pivots. As such below each course, as seen in the image above,
+is a recommendation list to newer more in demand skills to learn.
 
 
 
 ### What are their key goals?
 
 The key goal of these customers is to gain knowledge on topics that they
-previously lacked any understanding. They utilize the platform to extend their education
+previously lacked any understanding. They utilize the platform to extend their education.
+With Certification being offered, students are more willing to utilize the courses
+as they feel they will get something of value in return that could boost them in
+their respective career fields.
+
 
 ### How can you help them accomplish those goals
 
 This could be done by ensuring that they have the smoothest transitions within the website.
 It is also accomplished by ensuring all courses are thorough and their introduction concise.
-This ensures that they know what exactly a course will teach them before joining.
+This ensures that they know what exactly a course will teach them before joining. A roadmap
+could be a strong and unique factor in ensuring that individuals see their progress.
+The course accomplishes this through a completion system that tracks courses completed.
+How I would urge then is to list the skills gained and what roles you will be able
+to fill with these skills. For example if I completed a class on Data Acquisition
+and management, maybe the course would suggest that I am ready to start applying to
+Data Engineer roles.
+
 
 
 ### Reverse Engineering
@@ -41,13 +62,40 @@ are using both content-based and collaborative filtering.
 Content-based: Within Coursera you have the ability to set up your preferences for the
 types of courses you want to see within your environment.
 Collaborative filtering: Coursera also recommends you courses based on the searches
-as well as classes that you do. The will often label it within a certain category
-and utilize that cluster to aid you. 
+as well as classes that you do. They will often label it within a certain category
+and utilize that cluster to aid you. "A Recommender System is a process that seeks
+to predict user preferences" this is an actual exerpt from one of the courses
+taught on coursera. In regards to Courseras recommendation system I would use a 
+fuzzy based algorith which is a hybrid recommender system which solves data sparsity problem using a content based filtering approach and predicts ratings using a fuzzy based algorithm and improves the accuracy of the system by incorporating a confidence measure with each recommended item using a novel conformal prediction method forming a Hybrid Content based Fuzzy Conformal Recommender System (HCF-CRS)(journals). In the first graph below
+we see that content based filtering would be able to group the examples of movies.In the idea
+of reverse engineering coursera, this would be accomplished by course subjects. 
+In the second example is a recommendation I personally received from Coursera.
+Since I've been doing a lot of courses related to computer science it only makes sense
+that the recommendations I was given, were related to tech.
+
+```{r echo=FALSE, out.width= "100%"}
+ggdraw() + 
+  draw_image("C:/Users/keeno/OneDrive/Documents/MSDS/DATA607/Coursera Recommender System/coursera3.PNG", width = 0.8)
+
+ggdraw() + 
+  draw_image("C:/Users/keeno/OneDrive/Documents/MSDS/DATA607/Coursera Recommender System/coursera2.JPG", width = 0.8)
+
+```
 
 ### Suggestions for possible improvement
 
 For an improvement within Coursera's system I would opt that they create a UI recommendation
 system that shows you roadmaps towards careers you could achieve based on the courses you
-are taking. This way no one feel's like the information they gain is useless. This
-could motivate users to enroll in all the courses that push them towards their goals
-in the road map.
+are taking. This way no one feel's like the information they gain is useless.  A roadmap
+could be a strong and unique factor in ensuring that individuals see their progress.
+The course accomplishes this through a completion system that tracks courses completed.
+How I would urge then is to list the skills gained and what roles you will be able
+to fill with these skills. For example if I completed a class on Data Acquisition
+and management, maybe the course would suggest that I am ready to start applying to
+Data Engineer roles.
+
+Sources 1
+https://www.coursera.org/specializations/recommender-systems#courses
+
+Source2
+https://journals.plos.org/plosone/article?id=10.1371/journal.pone.0204849
