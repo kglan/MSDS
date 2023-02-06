@@ -1,0 +1,133 @@
+---
+title: "Trace  Determinant  Factorization"
+author: "Keeno Glanville"
+date: "2023-02-05"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+#Problem Set 1
+## 1. Given Our Matrix
+
+```{r}
+A <- matrix(c(2,5,3,5,0,1,0,3,3,2,1,2,2,4,2,1,5,6), nrow = 6)
+A
+A_t <- t(A)
+A_t
+
+```
+We see that our matrices of A and A_t are shown to haeb the dimensions 6x3 and 3x6 respectively
+
+
+
+```{r}
+A_t%*%A
+A%*%A_t
+```
+When we do A_t*A what we are doing is taking the 3x6 matrix and multiplying it 
+by the 6x3 matrix. This matches up as the rows from A_t match the columns from 
+A. Thus the resulting matrix will have a resulting dimension : 3x3
+
+However when we do A* A_t we take a 6x3 matrix and multiply it by a 3x6. While 
+the rows and columns match up to allow the multiplication the dimensions are
+now : 6x6
+
+
+
+## 2. Square Matrix
+
+The condition that A_tA = AA_t is only valid for a square matrix that is normal.
+A matrix is said to be normal if At = A. And to the prompt this could be an 
+an example of the identity matrix
+
+An example:
+```{r}
+nmat <- matrix(c(1,0,0,0,2,0,0,0,3), nrow = 3)
+nmat
+
+nmatt<- t(nmat)
+nmatt
+
+nmatt%*%nmat
+nmat%*%nmatt
+```
+The above matrix nmat is a diagonal matrix
+
+
+
+
+
+
+
+# Problem Set 2
+
+
+## Matrix
+```{r}
+mx <- matrix(c(1,2,3,4,5,6,7,8,9), nrow=3)
+mx
+```
+
+
+
+## Function
+```{r}
+LU = function(x){
+  if (nrow(x) >=5){
+    return("Matrix dimensions larger than expected")
+  }
+  
+  d = dim(x)
+  if (d[1] != d[2]){
+    return("Not a square matrix")
+  }
+  
+  
+  n = nrow(x)
+  l = diag(n)
+  
+  f= 0 #initialize
+  
+  while (f <= dim(x)[1]){    #While the first dimmension(row) of our input variable is less than or equal to our f which is initialized at 0
+    f = f + 1                #f  here will represent a stopper for our function to stop looping
+    i = f                    #i here will represent the row 
+    j = f                    #j will represent our columns
+    
+    
+  while (i <= dim(x)[1] -1) {    # This line tells us that while our row is less than or equal to the rows of our input's row dimension -1
+    c = x[i + 1, j]/ x[j,j]      # This code points to an exact coordinate of our input(*2,1), then it divides that by the coordinates of our current selected first                                      one is *1,1
+    x[i+1,] = x[i+1,]- c*x[j,]   #This code changes the input of our row +1 (*2nd row) to be the second row - our current row multiploied by our multiplier
+    l[i+1, j] = c                #We now create our L matrix from our diagonal initialized. so we turn our input into upper and have our lower to return
+    i = 1+ i                     #We now increase i for the next row and repeat iteration
+    
+  }
+  }
+  return(list(l,x))
+    
+}
+
+LU(mx)
+
+```
+
+
+
+
+
+## Check
+```{r}
+library(pracma)
+lu(mx)
+```
+
+
+
+
+
+
+
+
