@@ -1,0 +1,152 @@
+---
+title: "Eigenvalues and Eigenvectors"
+author: "Keeno Glanville"
+date: "2023-02-12"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(pracma)
+```
+
+# Problem Set 1
+
+## 1 What is the rank of the matrix A?
+
+```{r}
+A<- matrix(c(1,2,3,4,-1,0,1,3,0,1,-2,1,5,4,-2,-3), nrow = 4, ncol=4, byrow = TRUE)
+A
+# The rank of the matrix is determined by the number of number of independent rows. These are the non-zero rows in row echelon form
+
+reA<-rref(A)
+reA
+#This matrix has rank 4
+```
+
+
+
+
+## 2. Given an mxn matrix where m > n, what can be the maximum rank? The minimum rank, assuming that the matrix is non-zero?
+The maximum rank of a matrix is equal to the value of the lowest dimension of mxn
+
+
+
+## 3. What is the rank of matrix B?
+```{r}
+B<- matrix(c(1,2,1,3,6,3,2,4,2), nrow=3, byrow= TRUE)
+B
+
+reB<- rref(B)
+reB
+
+#The rank of this matrix is 1
+```
+
+
+
+# Problem Set 2
+
+Av − λv = (A − λI)v = 0
+```{r}
+A <- matrix(c(1, 2, 3, 0, 4, 5, 0, 0, 6), nrow=3, byrow=TRUE)
+A
+# characteristic polynomial of a matrix A is given by the determinant of A- lambda * Identity matrix 
+# For this example we will be using lambda to be x
+
+A <- matrix(c('1-λ', 2, 3, 0, '4-λ', 5, 0, 0, '6-λ'), nrow=3, byrow=TRUE)
+A
+
+```
+ determinant of A : (1-λ)((4-λ)(6-λ) - 5*0) - 2*0*0 = (1-λ)((4-λ)(6-λ))
+ characteristic equation: -λ^3 + 10λ^2 - 24λ + 24
+ lambda values (1-λ)((4-λ)(6-λ)) = 0
+### eigeinvalues of matrix λ = 1, 4, 6
+
+
+### eigen vector
+To find the eigen vector we know:  Av − λv = (A − λI)v = 0
+
+we now have find the eigen vectors
+
+### 1. First eigenvector
+```{r}
+λ = 1
+A1 <- matrix(c(1-λ, 2, 3, 0, 4-λ, 5, 0, 0, 6-λ), nrow=3, byrow=TRUE)
+A1
+
+# Thus we need a vector v that creates proves the statement (A - λI)v = 0
+
+```
+0v.1 +2v.2 +3v.3 = 0 
+0v.1 +3v.2 +5v.3 = 0
+0v.1 +0v.2 +5v.3 = 0
+
+V1 = 0, V2 = V3
+
+
+
+*Eigenvector for λ = 1 : (0, 0, 1)*
+
+
+
+
+
+
+### 2. Second Eigenvector
+```{r}
+λ = 4
+A1 <- matrix(c(1-λ, 2, 3, 0, 4-λ, 5, 0, 0, 6-λ), nrow=3, byrow=TRUE)
+A1
+
+# Thus we need a vector v that creates proves the statement (A - λI)v = 0
+
+```
+-3v.1 +2v.2 +3v.3 = 0 
+0v.1 +0v.2 +5v.3 = 0
+0v.1 +0v.2 +2v.3 = 0
+
+V1 = 0, V2 = 1, V3 = 0
+
+
+
+*Eigenvector for λ = 4 : (0, 1, 0)*
+
+
+
+
+
+
+### 3. Third Eigen vector
+```{r}
+λ = 6
+A1 <- matrix(c(1-λ, 2, 3, 0, 4-λ, 5, 0, 0, 6-λ), nrow=3, byrow=TRUE)
+A1
+
+# Thus we need a vector v that creates proves the statement (A - λI)v = 0
+
+```
+-5v.1 +2v.2 +3v.3 = 0 
+0v.1 −2v.2 +5v.3 = 0
+0v.1 +0v.2 +0v.3 = 0
+
+V1 = 0, V2 = 0, V3 = 1
+
+
+
+*Eigenvector for λ = 6  (0, 0, 1)*
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
