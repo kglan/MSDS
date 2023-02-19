@@ -1,0 +1,180 @@
+---
+title: "Linear Transformatons & Representation"
+author: "Keeno Glanville"
+date: "2/19/2023"
+output: html_document
+---
+
+
+
+# Load Dependencies
+
+```{r}
+rm(list = ls())
+library(jpeg)
+library(OpenImageR)
+library(Matrix)
+```
+
+
+
+# Check the dimensions of our first image.
+
+```{r}
+files <- "jpg/"
+img <- readJPEG(paste0(files,"/RC_2500x1200_2014_us_53446.jpg"))
+
+dim(img)
+
+
+#collect the dimensions 
+row_dim <- dim(img)[1]
+col_dim <- dim(img)[2]
+channel_dim <- dim(img)[3]
+```
+
+
+Plot our image
+```{r}
+# plot the image
+imageShow(img)
+
+```
+
+
+Now that we've seen how to do it for one example we will now have all our examples
+
+```{r}
+filenames <- list.files(path=files,pattern = ".jpg")
+
+# Initialize the matrix where all files will be stored
+all_images_data <- matrix(0, length(filenames), prod(dim(img))) 
+
+# Show the dimensions of the matrix
+dim(all_images_data)
+
+
+
+```
+We know that there are 17 shoes thus all the shoes are here 
+
+
+Images into a matrix
+```{r}
+
+counter <- 1
+
+for (filename in filenames) {
+  print(paste("shoefile: ",filename))
+  img <- readJPEG(paste0("jpg/",filename))
+  red  <- as.vector(img[,,1])
+  green  <- as.vector(img[,,2])
+  blue  <- as.vector(img[,,3])
+  
+  #Images are stored a single vector red-green-blue  
+  all_images_data[counter,] <- t(c(red, green, blue))  
+
+  counter <- counter+1
+}
+```
+
+
+
+
+```{r}
+shoe_i <- 2
+all_images_data <- t(all_images_data)
+#plot_shoe(all_images_data[,shoe2test])
+imageShow(array(all_images_data[,shoe_i],c(row_dim,col_dim,channel_dim)))
+
+
+```
+
+# SVD and Variance
+
+```{r}
+# Scale data before applying SVD
+scaled_data <- scale(all_images_data)
+scaled_data[is.nan(scaled_data)] = 0
+svd_decomp <- svd(scaled_data)
+
+
+plot(svd_decomp$d^2/sum(svd_decomp$d^2), type="b",xlab = "Column", ylab = "Prop. of variance explained", pch = 19)
+
+```
+
+
+
+We now have the variance and will want to plot shoes by their variance. We notice that as we increase the columns we increase our variance. This is due to the fact that the columns all represent new components and as we add more components the overall images become defined. This is important because by examining these eigenvariables, we can identify the key features that are most significant in differentiating the images.
+
+
+
+
+# 80%
+
+```{r}
+var_pct <- 0.8
+vectors <- which(cumsum(svd_decomp$d^2/sum(svd_decomp$d^2)) >= var_pct)[1]
+
+      
+
+newimage <- svd_decomp$u[, 1:vectors] %*% diag(svd_decomp$d[1:vectors]) %*% t(svd_decomp$v[,1:vectors])
+
+imageShow(array(newimage,c(row_dim,col_dim,channel_dim)))
+```
+
+
+
+
+
+# 90%
+
+```{r}
+shoe_i = 17
+var_pct <- 0.9
+vectors <- which(cumsum(svd_decomp$d^2/sum(svd_decomp$d^2)) >= var_pct)[1]
+print(paste0("Vectors to use: ", vectors))
+newimage <- svd_decomp$u[, 1:vectors] %*% diag(svd_decomp$d[1:vectors]) %*% t(svd_decomp$v[,1:vectors])
+imageShow(array(newimage[,shoe_i],c(row_dim,col_dim,channel_dim)))
+
+```
+
+
+
+
+
+
+
+# 99%
+
+```{r}
+shoe_i = 16
+var_pct <- 0.99
+vectors <- which(cumsum(svd_decomp$d^2/sum(svd_decomp$d^2)) >= var_pct)[1]
+print(paste0("Vectors to use: ", vectors))
+
+newimage <- svd_decomp$u[, 1:vectors] %*% diag(svd_decomp$d[1:vectors]) %*% t(svd_decomp$v[,1:vectors])
+imageShow(array(newimage[,shoe_i],c(row_dim,col_dim,channel_dim)))
+
+```
+
+# Conclusion
+This assignment allowed us to utilize the images of various shoes and deconstruct them into RBG matrices. We then were able to perform PCA on these items to illustrate the vector components that caused the most variation. As we added more vector components we saw that the images became more defined, unique and generall started to differentiate from each other. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
