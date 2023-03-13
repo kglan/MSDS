@@ -1,0 +1,53 @@
+---
+title: "Imp. Distributions"
+author: "Keeno Glanville"
+date: "2023-03-13"
+output: html_document
+---
+
+
+
+# 1
+ We must find the difference between the two probabilities
+ 
+P(Y=y) = P(Y≤y) - P(Y≤y-1) = [(k-y+1)/k]^n - [(k-y)/k]^n
+
+Thus:
+P(Y=y) = [(k-y+1)^n - (k-y)^n]/k^n
+
+
+# 2a
+```{r}
+cat("Prob not failing 8 yrs geometric=", (9/10)^8, "\n",
+    "Expected=", 10, "\n",
+    "SD",sqrt((1-1/10)/(1/10)^2) )
+
+```
+
+
+# 2b
+```{r}
+cat("Prob not failing 8 yrs exponential=", exp(-8/10), "\n",
+    "Expected=", 10, "\n",
+    "SD",10) 
+
+```
+
+
+
+# 2c
+```{r}
+cat("Prob not failing 8 yrs exponential=", dbinom(0,8,0.1), "\n",
+    "Expected=",0.1*8 , "\n",
+    "SD",sqrt(0.8*0.9)) 
+```
+
+
+
+#2d
+```{r}
+cat("Prob not failing 8 yrs exponential=", ppois(0,lambda = 0.8), "\n",
+    "Expected=", 0.8, "\n",
+    "SD",sqrt(8/10)) 
+
+```
