@@ -1,0 +1,142 @@
+---
+title: "Regression Analysis"
+author: "Keeno Glanville"
+date: "2023-04-16"
+output: html_document
+---
+# View dataset
+```{r}
+
+head(cars)
+colnames(cars)
+```
+
+
+
+
+
+# Visualize Data
+```{r}
+plot(cars[,"speed"], cars[,"dist"], main="Speed vs Stopping Distance",
+xlab="Speed", ylab="Stopping Distance")
+
+```
+
+
+
+
+
+
+
+
+
+# Model Creation
+-17.579 + 3.932*speed  
+
+```{r}
+model <- lm(dist~speed, data = cars)
+model
+```
+
+# Model Evaluation
+```{r}
+summary(model)
+
+```
+
+
+
+
+
+
+
+# Residual Analysis
+
+```{r}
+plot(model)
+
+```
+
+
+
+
+
+
+
+
+
+```{r}
+
+
+```
+
+
+
+
+
+
+
+
+
+```{r}
+
+
+```
+
+
+
+
+
+
+
+
+
+```{r}
+
+
+```
+
+
+
+
+
+
+
+
+
+```{r}
+
+
+```
+
+
+
+
+
+
+
+
+
+```{r}
+
+
+```
+
+
+
+
+
+
+
+
+
+```{r}
+
+
+```
+
+
+
+
+
+
