@@ -1,0 +1,98 @@
+---
+title: "Discussion12"
+author: "Keeno Glanville"
+date: "2023-04-21"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+set.seed(1324)
+knitr::opts_chunk$set(echo = TRUE)
+library(readr)
+library(tidyr)
+library(dplyr)
+library(ggplot2)
+```
+
+# Determine if the average price of a house in NY is decreasing or increasing compared to one year ago.  Will involve turning the months/years into a long format.
+
+## Load data
+```{r}
+urldat <- "https://raw.githubusercontent.com/kglan/MSDS/main/DATA605/Regression%20Analysis/CarPrice_Assignment.csv"
+zill<- read_csv(url(urldat))
+zill
+```
+
+
+Multiple Regression
+
+
+
+```{r}
+model <- lm(price~., data =zill)
+summary(model)
+
+
+```
+
+
+
+
+
+
+```{r}
+plot(model)
+
+
+
+```
+
+# Change terms for binomial and quadratic
+
+```{r cars}
+
+zill$fueltype <- ifelse(zill$fueltype == "gas", 1, 0)
+zill$LxW <- zill$carlength * zill$carwidth
+zill2<-zill%>%
+  select(-c(carlength, carwidth))
+
+```
+
+Rerun model with additions
+
+```{r}
+
+model2 <- lm(price~., data =zill2)
+summary(model2)
+
+
+```
+
+
+
+```{r}
+plot(model2)
+
+
+
+```
+
+
+
+
+# Conclusion 
+The second plot including the binomial and the quadratic is actually less accurate and the Q-Q plot shows the data is not distributed normally, however we have strong 
+R2 values. I would think with some normalization we could eventually utilize a strong linear model.
+
+
+
+
+
+
+
+
+
+
+
+
+

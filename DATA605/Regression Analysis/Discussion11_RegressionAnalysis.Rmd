@@ -1,0 +1,106 @@
+---
+title: "Discussion 11"
+author: "Keeno Glanville"
+date: "2023-04-16"
+output: html_document
+---
+
+
+
+Will be going with a dataset I had analyzed back in DATA607 before I learnt of regressions
+
+```{r setup, include=FALSE}
+library(corrplot)
+library(readr)
+library(dplyr)
+urldata <- "https://raw.githubusercontent.com/kglan/MSDS/main/DATA607/Data%20Transformation/GunViolence/guns.csv"
+gundata.r <- read_csv(url(urldata))
+
+
+gundata_clean <- gundata.r %>%
+  select(-c("...1", "male")) %>%
+  rename(
+    "%Black" = "afam",
+    "%White" = "cauc",
+    "Crime/100k" = "violent",
+    "Murder/100k" = "murder",
+    "Robbery/100k" = "robbery",
+    "Prisoners/100k" = "prisoners",
+    "Income/capitaofstate" = "income",
+    "Density(sqrmi/1000)" = "density",
+    "ShallCarryLaw" = "law",
+    "Population/mil" = "population"
+  )
+gundata_clean
+
+
+
+```
+
+
+
+
+# View Dataset on Gundata 
+ 
+```{r}
+ head(gundata_clean)
+ 
+```
+
+
+
+
+
+# Correlation Plot
+```{r}
+gundata_corplot <- gundata_clean %>%
+  select(-"state", -"ShallCarryLaw")
+gundata_cor <- cor(gundata_corplot, method = "pearson")
+col_gd <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+corrplot(gundata_cor, method = "color", col = col_gd(200),
+         type = "upper", order = "hclust",
+         addCoef.col = "black",
+         tl.col = "black", tl.srt = 45,)
+ 
+```
+
+
+# Multiple Regressuin Model for Crime/100k as a factor of Density and income of state
+Robbery and Murder are obviouslyt contributing factors to crime so I dont want to view those parameters. I want to see what really creates the crime
+
+```{r}
+ model <- lm(`Crime/100k` ~ `Density(sqrmi/1000)`+ `Income/capitaofstate`, data= gundata_corplot)
+ model
+```
+
+
+# Model Summary
+ 
+```{r}
+ summary(model)
+ 
+```
+
+
+
+ 
+```{r}
+plot(model)
+ 
+```
+
+
+# Conclusion
+The model isnt very strong and we see that there is a substantial skew of our data in regards to the Q-Q plot, also we see that the data is not showing a lot of normality.
+
+
+
+
+
+
+
+
+
+
+
+

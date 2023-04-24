@@ -1,0 +1,92 @@
+---
+title: "Regression Analysis 2"
+author: "Keeno Glanville"
+date: "2023-04-23"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(dplyr)
+library(readr)
+
+df<- read_csv("C:/Users/keeno/OneDrive/Documents/MSDS/DATA605/Regression Analysis/who.csv")
+```
+
+
+
+
+
+```{r}
+plot(x =df$TotExp  , y= df$LifeExp)
+
+```
+
+
+
+
+
+# 1 
+```{r}
+model <- lm(LifeExp ~ TotExp, data=df)
+summary(model)
+
+# Our model tells us that through the p-value being small thatr we can reject the null hypothesis and conclude that the predictor in our model has an effect on the overall response variable. This is also supported by the F1 score that tells us that the model fits the data
+```
+
+
+
+# 2
+
+```{r}
+df$LifeExp = df$LifeExp**4.6
+df$TotExp = df$TotExp**0.06
+
+plot(x =df$TotExp  , y= df$LifeExp)
+model <- lm(LifeExp ~ TotExp, data=df)
+summary(model)
+
+
+# The F-statistic is even greater in this model suggesting it is strong for a linear model, as well as the p-value being smaller. We also see that with our R-squared value the model better fits the previous
+```
+
+
+
+
+# 3
+```{r}
+pred1 <- predict(model, newdata = data.frame(TotExp = 1.5))
+pred2 <- predict(model, newdata = data.frame(TotExp = 2.5))
+# Print the predictions
+cat("Life expectancy for TotExp^.06 = 1.5: ", pred1**(1/4.6), "\n")
+cat("Life expectancy for TotExp^.06 = 2.5: ", pred2**(1/4.6), "\n")
+
+```
+
+
+
+
+# 4
+```{r}
+
+model <- lm(LifeExp ~ PropMD + TotExp + PropMD*TotExp, data = df)
+summary(model)
+
+# The model is the best in terms of R-squared value however it doesn't have as strong of an F statistic as 
+```
+
+
+
+
+# 5
+```{r}
+pred1 <- predict(model, newdata = data.frame(TotExp = 14, PropMD =0.03))
+cat("Life expectancy for TotExp^.06 = 14: ", pred1^(1/4.6), "\n")
+
+```
+
+
+The prediction does not seem realistic at all in the fact that the TotalExP is so large. This should skew our model with something it hasn't seen before.
+
+
+
+
