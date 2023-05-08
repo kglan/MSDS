@@ -1,0 +1,59 @@
+---
+title: "Taylor Series Approximations"
+author: "Keeno Glanville"
+date: "2023-05-08"
+output: html_document
+---
+
+
+
+
+
+# Load Package
+```{r}
+library(pracma)
+
+```
+
+
+# f(x) = 1/(1-x)
+```{r}
+f1 <- function(x) { 1 / (1 - x) }
+a1 <- 0
+n1 <- 5
+taylor(f1,a1,n1)
+
+
+
+
+```
+
+# f(x) = e^x
+```{r}
+f1 <- function(x) { exp(x) }
+a1 <- 0
+n1 <- 5
+taylor(f1,a1,n1)
+
+
+```
+
+# f(x) = ln(1 + x)
+```{r}
+f1 <- function(x) { log(1 + x) }
+a1 <- 0
+n1 <- 5
+taylor(f1,a1,n1)
+
+
+
+```
+# f(x) = x^(1/2)
+```{r}
+f1<- function(x) { x^1/2 }
+a1 <- 0
+n1 <- 4
+taylor(f1,a1,n1)
+
+
+```
