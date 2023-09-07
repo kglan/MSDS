@@ -1,27 +1,338 @@
 ---
-title: "Assignment1"
+title: "Target Wins"
 author: "Keeno Glanville"
 date: "2023-09-05"
-output: html_document
+output:
+  pdf_document:
+    toc: yes
+  html_document:
+    theme: cerulean
+    toc: yes
+    toc_float: yes
 ---
 
-```{r}
+# DATA EXPLORATION
 
+Within this data set there are 2276 observations of 16 variables. The main focal point of this data is that we want to predict the target wins that a team will have over a given parameters.
+
+```{r include-image1.1, echo=FALSE}
+knitr::include_graphics('HW1.1.PNG')
+```
+
+To first attack the data set there was some basic cleaning to remove the unnecessary naming within the columns. We then did some exploration summary of each column as well as the missing values within each. (ALL ACTIONS DONE TO TRAINING SETS DONE TO TESTING).
+
+
+```{r include-image1.2, echo=FALSE}
+knitr::include_graphics('HW1.2.PNG')
+```
+
+# DATA PREPARATION
+
+In the preparation of the data for analysis I utilized various techniques to best
+decide how I would proceed with my analysis. One of these methods included creating a 
+correlation heat map that would be essential in allowing me to better understand
+the data. This is significant because it would allow me to make a more informed
+decision as to what type of model I would create on the data set.
+
+
+
+```{r include-image1.3, echo=FALSE}
+knitr::include_graphics('HW1.3.PNG')
+```
+
+
+In continuation of preparation I utilized plots of all the variables against
+the target variable to see any specific linear relationships between them. Overall
+there weren't very much direct linear relationships. 
+```{r include-image1.4, echo=FALSE}
+knitr::include_graphics('HW1.4.PNG')
+```
+
+
+# BUILD MODELS
+
+To build the build the models I will go with three approaches. The first will be
+a basic approach that will give us a model that is not tampered with. The second 
+model chosen was normalized as well as scaled. This would be able to give us a
+model that had the stronger assumptions of regressions. The final model would be 
+one that incorporated backward propogation. This would be one that removed variables
+one at a time with p values > 0.05.
+
+```{r include-image1.5, echo=FALSE}
+knitr::include_graphics('HW1.5.PNG')
+```
+
+
+# SELECT MODELS
+
+The model selection here we will go with will be the seceond model. In terms of selecting a model we will always go for the best performance because that should give us the best results in real world scenarios. We don't want to be bias in our decision as it could hinder us going further. What we notice in the model however is that we didnt have a perfectly normal dataset through the residual plots. The Q-Q plot also showed various skewedness through the tailends. Overall this was similar throughout the models so through chosing the strong R-squared value we selected the model with the strongest predictor of future variables.
+
+
+```{r include-image1.6, echo=FALSE}
+knitr::include_graphics('HW1.6.PNG')
 ```
 
 
 
 
+
+
+# APPENDIX
 ```{r}
+library(tidyverse)
+library(readxl)
+library(dplyr)
+library(naniar)
+library(mice)
+library(corrplot)
+library(ggplot2)
+library(tidyr)
+library(Metrics)
+library(ggfortify)
+set.seed(1234)
+```
+
+## Load Training and Testing data
+
+```{r}
+trainraw <- read_csv('https://raw.githubusercontent.com/kglan/MSDS/main/DATA621/Assignment1/moneyball-training-data.csv', col_names = TRUE)[,-1] 
+testraw <- read_csv('https://raw.githubusercontent.com/kglan/MSDS/main/DATA621/Assignment1/moneyball-evaluation-data.csv',col_names=TRUE)[,-1] 
+```
+
+## Data Exploration
+
+```{r}
+dim(trainraw)
+head(trainraw)
+```
+
+```{r}
+#Clean data headers and summarize
+colnames(trainraw) <- gsub("TEAM_", "", colnames(trainraw))
+colnames(testraw) <- gsub("TEAM_", "", colnames(testraw))
+summary(trainraw)
+```
+
+```{r}
+# Missing values
+sapply(trainraw, function(x) sum(is.na(x)))
+sapply(testraw, function(x) sum(is.na(x)))
+```
+
+Visualization of missing data
+
+```{r}
+gg_miss_var(trainraw)+ labs(title="Visual Summaries of Missing Train Data")
+gg_miss_var(testraw)+ labs(title="Visual Summaries of Missing Test Data")
+```
+
+```{r}
+vis_miss(trainraw)
 
 ```
 
-## Including Plots
+## Data Preparation
+
+### Imputation of Missing Values
+
+```{r}
+trainmice<- mice(trainraw, m = 5, method = "pmm", maxit = 50, seed = 123)
+train<- complete(trainmice, action = 1)
+
+testmice<- mice(testraw, m = 5, method = "pmm", maxit = 50, seed = 123)
+test<- complete(testmice, action = 1)
+```
+
+```{r}
+# Missing values
+sapply(train, function(x) sum(is.na(x)))
+sapply(test, function(x) sum(is.na(x)))
+gg_miss_var(train)+ labs(title="Visual Summaries of Missing Train Data")
+gg_miss_var(test)+ labs(title="Visual Summaries of Missing Test Data")
+
+```
+
+### Visualization Utilizing Correlation Matrix
+
+```{r, fig.width=10, fig.height=10}
+
+# Find the correlation of the dataset
+corplotdf <- cor(train, method = "pearson")
+col_gd <- colorRampPalette(c("#BB4444", "#EE9988", "#FFFFFF", "#77AADD", "#4477AA"))
+
+# Create the correlation plot
+corrplot(corplotdf, method = "color", col = col_gd(200),
+         type = "upper", order = "hclust",
+         addCoef.col = "Black",
+         tl.col = "black", tl.srt = 45, number.cex = 0.5, tl.cex = 0.8)
+
+```
+
+## Visualization of Boxplots
+
+```{r, fig.width=10, fig}
+# Create a boxplot for all columns
+train_long <- gather(train)
+
+# Create a boxplot for all columns
+ggplot(train_long, aes(x = key, y = value)) +
+  geom_boxplot() +
+  xlab("Variable") +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
+```
+
+## Visualixation of plots of each variable to target variable
+
+```{r}
+train %>% gather(variable, value, -TARGET_WINS) %>% ggplot(., aes(value, TARGET_WINS))+geom_point()+geom_smooth(method="lm")+
+  facet_wrap(~variable, scales="free")+ labs(title="Relationship between Predictors and TARGET_WINS")
+
+```
+
+## Build Models
+
+### Model 1
+
+Utilization of all variables to create initial model
+
+```{r}
+train1<-train
+test1<-test
+model1 <- lm(train1$TARGET_WINS ~ ., data = train1)  
+
+```
+
+### Model 2
+
+We will upgrade the first model by correcting the assumptions of normalization as well as scaling our data
+
+```{r}
+train2 <- train %>%
+  mutate(across(
+    c(PITCHING_BB, PITCHING_H, FIELDING_E, BASERUN_SB, BASERUN_CS),
+    ~ log10(. + 1),
+    .names = "log10_{.col}"
+  )) %>%
+  mutate_all(scale)
+
+test2 <- test %>%
+  mutate(across(
+    c(PITCHING_BB, PITCHING_H, FIELDING_E, BASERUN_SB, BASERUN_CS),
+    ~ log10(. + 1),
+    .names = "log10_{.col}"
+  )) %>%
+  mutate_all(scale)
+
+
+model2 <- lm(train2$TARGET_WINS ~ ., data = train2)  
+
+```
+
+### Model3
+
+We will use backward propagation to remove variables that are not significant to our data
+
+```{r}
+# Perform backward elimination using lm and step function in a loop
+train3<-train2
+test3<-test2
+model3 <- lm(train3$TARGET_WINS ~ ., data = train3)  # Initial full model
+
+while(any(summary(model3)$coefficients[, "Pr(>|t|)"] > 0.05)) {
+  reduced_model <- step(model3, direction = "backward")
+  
+  if(identical(reduced_model, model3)) {
+    break  # Exit the loop if no further variable removal
+  } else {
+    model3 <- reduced_model  # Update the model for the next iteration
+  }
+}
+
+
+```
+
+## Select Model
+
+```{r}
+summary(model1)
+```
+
+```{r}
+summary(model2)
+```
+
+```{r}
+summary(model3)
+```
+
+### Pre-Decision
+
+Based on the information so far. Second model are tied for the most optimal models as they are the ones with the highest R squared values
+
+```{r}
+autoplot(model1)
+autoplot(model2)
+autoplot(model3)
+```
+
+### Final Decision
+
+The model selection here we will go with will be the seceond model. In terms of selecting a model we will always go for the best performance because that should give us the best results in real world scenarios. We don't want to be bias in our decision as it could hinder us going further. What we notice in the model however is that we didnt have a perfectly normal dataset through the residual plots. The Q-Q plot also showed various skewedness through the tailends. Overall this was similar throughout the models so through chosing the strong R-squared value we selected the model with the strongest predictor of future variables.
+
+Predictions
+
+```{r}
+# Prediction
+predictions <- predict(model2, newdata = test2)
+
+# Calculate Mean Squared Error (MSE)
+mse <- mse(train2$TARGET_WINS, predictions)
+
+# Calculate R-squared (R2) from the model summary
+model_summary <- summary(model2)
+r_squared <- model_summary$r.squared
+
+# Print the evaluation metrics
+cat("Mean Squared Error (MSE):", mse, "\n")
+cat("R-squared (R2):", r_squared, "\n")
 
 
 
 
 
+```
 
 
+```{r}
+# Prediction( Failed Model 1)
+predictions1 <- predict(model1, newdata = test1)
 
+# Calculate Mean Squared Error (MSE)
+mse <- mse(train1$TARGET_WINS, predictions1)
+
+# Calculate R-squared (R2) from the model summary
+model_summary <- summary(model1)
+r_squared <- model_summary$r.squared
+
+# Print the evaluation metrics
+cat("Mean Squared Error (MSE):", mse, "\n")
+cat("R-squared (R2):", r_squared, "\n")
+
+```
+
+```{r}
+# Prediction(Failed Model 3)
+predictions <- predict(model3, newdata = test3)
+
+# Calculate Mean Squared Error (MSE)
+mse <- mse(train3$TARGET_WINS, predictions)
+
+# Calculate R-squared (R2) from the model summary
+model_summary <- summary(model3)
+r_squared <- model_summary$r.squared
+
+# Print the evaluation metrics
+cat("Mean Squared Error (MSE):", mse, "\n")
+cat("R-squared (R2):", r_squared, "\n")
+
+```
