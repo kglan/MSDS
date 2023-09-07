@@ -1,0 +1,27 @@
+---
+title: "Assignment1"
+author: "Keeno Glanville"
+date: "2023-09-05"
+output: html_document
+---
+
+```{r}
+
+```
+
+
+
+
+```{r}
+
+```
+
+## Including Plots
+
+
+
+
+
+
+
+
