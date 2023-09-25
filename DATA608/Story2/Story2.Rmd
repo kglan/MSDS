@@ -1,0 +1,260 @@
+---
+title: "Can the FED Control Inflation and Maintain Full Employment"
+author: "Keeno Glanville"
+date: "2023-09-24"
+output:
+  html_document:
+    theme: cerulean
+    toc: yes
+    toc_float: yes
+  pdf_document:
+    toc: yes
+---
+
+
+
+
+
+
+
+# Register for API keys
+
+
+Within this assignment I will be utilizing data from the Bureau of Labor 
+Statistics Public Data API and the Federal Reserve Board. In order to obtain the
+data I require I will sign up for API keys from both of these organizations.
+https://fred.stlouisfed.org/docs/api/api_key.html
+https://data.bls.gov/registrationEngine/
+
+API KEYS
+FRED:    ab3dc205dd28ac1d8daf9da1678c6612
+BLS : 6f4c57a4d5264889adb615c97905e8cc
+
+```{r include=FALSE}
+library(devtools)
+library(blsR)
+library(tidyverse)
+library(readxl)
+library(dplyr)
+library(naniar)
+library(mice)
+library(corrplot)
+library(ggplot2)
+library(tidyr)
+library(jsonlite)
+library(glue)
+library(Metrics)
+library(ggfortify)
+library(knitr)
+library(lubridate)
+library(pROC)
+library(httr)
+library(caret)
+library(cowplot)
+library(zoo)
+set.seed(1234)
+```
+
+
+```{r}
+fed<- "ab3dc205dd28ac1d8daf9da1678c6612"
+bls<- "6f4c57a4d5264889adb615c97905e8cc"
+```
+
+
+# Read Data
+```{r}
+#CPI
+id <- 'APU0000702111'
+url <- glue("https://api.bls.gov/publicAPI/v2/timeseries/data/{id}?registrationkey={bls}&startyear=2004&endyear=2023")
+cpiraw <- GET(url)
+cpirawt <- content(cpiraw, "text", encoding = "UTF-8")
+cpijson <- fromJSON(cpirawt, flatten = TRUE)
+cpi1 <- as.data.frame(cpijson[[4]])$series.data[[1]]
+cpi1 <- cpi1[-4]
+
+#This data stops at 2003 and we need 25 years
+url2 <- glue("https://api.bls.gov/publicAPI/v2/timeseries/data/{id}?registrationkey={bls}&startyear=1998&endyear=2003")
+cpiraw2 <- GET(url2)
+cpirawt2 <- content(cpiraw2, "text", encoding = "UTF-8")
+cpijson2 <- fromJSON(cpirawt2, flatten = TRUE)
+cpi2 <- as.data.frame(cpijson2[[4]])$series.data[[1]]
+
+# Combining our CPI data
+cpi <- rbind(cpi1, cpi2)
+
+# Converting dates from BLS format
+#cpi$date <- str_c(cpi$periodName," ", cpi$year)
+#cpi$date <- myd(cpi$date, truncated=1)
+
+# cast types
+#cpi$cpi <- as.double(cpi$value)
+#cpi <- cpi[, c("date", "cpi")]
+```
+
+
+```{r}
+#Federal Funds Rate
+url <- glue("https://api.stlouisfed.org/fred/series/observations?series_id=FEDFUNDS&api_key={fed}&file_type=json&frequency=m&observation_start=1998-01-01")
+fredraw <- GET(url)
+fredrawt <- content(fredraw, "text", encoding = "UTF-8")
+fredjson <- json <- fromJSON(fredrawt, flatten = TRUE)
+fred <- fredjson$observations
+```
+
+
+```{r}
+#Unemployment
+#second key had to be gotten due to attempts
+bls<-"58ad2df26ad741cab30a10633f53e719"
+bls_set_key(bls) 
+series_id = "LNS14000000"
+
+un1<-get_series_table(
+  series_id,
+  api_key = bls,
+  start_year = 2014,
+  end_year = 2023,
+  year_limit = NULL,
+  parse_values = TRUE
+)
+
+un2<-get_series_table(
+  series_id,
+  api_key = bls,
+  start_year = 2004,
+  end_year = 2013,
+  year_limit = NULL,
+  parse_values = TRUE
+)
+
+un3<-get_series_table(
+  series_id,
+  api_key = bls,
+  start_year = 1998,
+  end_year = 2003,
+  year_limit = NULL,
+  parse_values = TRUE
+)
+
+unn <- rbind(un1,un2)
+unemployment <- rbind(unn,un3)
+
+```
+
+
+```{r}
+head(cpi)
+```
+
+
+```{r}
+head(unemployment)
+```
+
+
+```{r}
+head(fred)
+```
+
+# Clean Data
+Since we know that CPI and Unemployment are from the same site we cna cleanse them
+the same and add them to the same data frame
+
+```{r}
+# Directly assigning a new name to the column
+unemployment$`unemployment rate` <- unemployment$value
+unemployment <- unemployment[-4] 
+```
+
+
+```{r}
+cpi$`cpi rate` <- cpi$value
+cpi <- cpi[-4] 
+cpi <- cpi[, !(names(cpi) %in% c("period","footnotes"))]
+```
+
+
+```{r}
+fred$year <- year(fred$date)
+fred$periodName <- month.name[month(fred$date)]
+fred$`federal funds rate` <- fred$value
+fred <- fred[, !(names(fred) %in% c("realtime_start","value", "realtime_end", "date"))]
+
+```
+
+
+```{r}
+df <- cpi
+df$`unemployment rate` <- unemployment$`unemployment rate`
+df <- merge(df, fred, by = c("year", "periodName"))
+```
+
+# Data Visualization
+```{r}
+# Create a new column "Month-Year" by combining "year" and "periodName"
+df$MonthYear <- paste(df$year, df$periodName, sep = "-")
+df$MonthYear <- as.yearmon(df$MonthYear, format = "%Y-%B")
+```
+
+```{r}
+write.csv(df, file = "df.csv", row.names = FALSE)
+```
+
+```{r, fig.width=11, fig.height=8}
+
+
+library(ggplot2)
+
+# Assuming your DataFrame is called df and the "MonthYear" column is of class 'yearmon'
+# If you haven't already converted it, you can do it with:
+# df$MonthYear <- as.yearmon(df$MonthYear, format = "%Y-%B")
+
+# Create a line plot for CPI
+plot_cpi <- ggplot(df, aes(x = MonthYear, y = `cpi rate`)) +
+  geom_line(color = "blue") +
+  labs(title = "CPI Over Time", y = "CPI Rate")
+
+# Create a line plot for Unemployment Rate
+plot_unemployment <- ggplot(df, aes(x = MonthYear, y = `unemployment rate`)) +
+  geom_line(color = "red") +
+  labs(title = "Unemployment Rate Over Time", y = "Unemployment Rate")
+
+# Create a line plot for Federal Funds Rate
+plot_fed_funds <- ggplot(df, aes(x = MonthYear, y = `federal funds rate`)) +
+  geom_line(color = "green") +
+  labs(title = "Federal Funds Rate Over Time", y = "Federal Funds Rate")
+
+# Arrange the plots in a grid
+library(cowplot)
+
+economy_plot <- plot_grid(plot_cpi, plot_unemployment, plot_fed_funds,
+                          ncol = 1, align = "v")
+
+# Show the combined plot
+economy_plot
+
+
+```
+
+
+
+# Conclusion
+If you look at this illustration it suggests that If CPI remains steady or stable, 
+then The Federal Reserve has been controlling inflation and has policy in place
+to tackle the phenomenon. When we look at the Unemployment rate overtime, we want 
+to see that it is also low suggesting that the Federal Reserve is also taking 
+control of that5 scenario. Last the Funds Rate is the tool the Federal Reserve
+utilizes to control these parameters so we want to see where this has direct 
+correlation with unemployment and CPI. Overall The data shows that the Federal 
+Reserve has been controlling the economy with policy besides in the years of JAN2020.
+This is significant because this would be a black swan year where COVID-19 would
+create a pandemic.This is overall alarming however because if we look at the funds
+rate currently. It means that there is a serious wave of layoffs soon to come.
+
+
+```{r}
+#Graphic not knitted well so will be displayed below
+knitr::include_graphics('image.PNG')
+```
+
