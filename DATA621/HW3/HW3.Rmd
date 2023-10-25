@@ -13,57 +13,183 @@ output:
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+# Appendix
+```{r include=FALSE}
+library(tidyverse)
+library(readxl)
+library(dplyr)
+library(naniar)
+library(mice)
+library(corrplot)
+library(ggplot2)
+library(tidyr)
+library(Metrics)
+library(ggfortify)
+library(knitr)
+library(pROC)
+library(caret)
+library(psych)
+set.seed(1234)
+```
+
 ```{r}
+trainraw <- read_csv('https://raw.githubusercontent.com/kglan/MSDS/main/DATA621/HW3/crime-training-data_modified.csv', col_names = TRUE)
+testraw <- read_csv('https://raw.githubusercontent.com/kglan/MSDS/main/DATA621/HW3/crime-evaluation-data_modified.csv',col_names=TRUE) 
+```
+
+
+```{r}
+dim(trainraw)
+```
+
+
+```{r}
+head(trainraw)
+```
+
+
+```{r}
+summary(trainraw)
+```
+
+
+```{r}
+sapply(trainraw, function(x) sum(is.na(x)))
+sapply(testraw, function(x) sum(is.na(x)))
+```
+
+
+```{r}
+sapply(trainraw, class)
+sapply(testraw, class)
+```
+
+
+```{r}
+train <- trainraw%>%
+  rename(Residential_zone_Large = zn)%>%
+  rename(Industrial_zone = indus )%>%
+  rename(Charles_River_border = chas)%>%
+  rename(NitrousOxide_conc = nox)%>%
+  rename(Rooms_avg = rm)%>%
+  rename(OwnerOccupiedUnits= age)%>%
+  rename(Highway_Index = rad)%>%
+  rename(dis_to_emplyoymentcenter=dis)%>%
+  rename(Dangerous = target)%>%
+  mutate(Charles_River_border= factor(Charles_River_border))%>%
+  mutate(Highway_Index= factor(Highway_Index))%>%
+  mutate(Dangerous= factor(Dangerous))
+
+test <- testraw%>%
+  rename(Residential_zone_Large = zn)%>%
+  rename(Industrial_zone = indus )%>%
+  rename(Charles_River_border = chas)%>%
+  rename(NitrousOxide_conc = nox)%>%
+  rename(Rooms_avg = rm)%>%
+  rename(OwnerOccupiedUnits= age)%>%
+  rename(Highway_Index = rad )%>%
+  rename(dis_to_emplyoymentcenter=dis)%>%
+  mutate(Charles_River_border= factor(Charles_River_border))%>%
+  mutate(Highway_Index= factor(Highway_Index))
+  
+```
+
+
+
+
+```{r}
+colnames(train)
+```
+
+
+```{r}
+# Subset the dataset to include only numeric predictor variables and the target variable
+numeric_predictors <- train%>%
+  select(-c("Highway_Index", "Charles_River_border"))
+colnames(numeric_predictors)
 
 ```
 
 
 ```{r}
+numeric_vars_list <- c("Residential_zone_Large", "Industrial_zone", "NitrousOxide_conc",
+                       "Rooms_avg", "OwnerOccupiedUnits", "dis_to_emplyoymentcenter",
+                       "tax", "ptratio", "lstat", "medv")
 
+point_biserial_correlation <- cor(as.numeric(numeric_predictors$Dangerous), numeric_predictors[numeric_vars_list])
+
+# View the sorted correlations
+print(point_biserial_correlation)
 ```
 
 
 ```{r}
+  # Box plot
+ggplot(numeric_predictors, aes(x = Dangerous, y = NitrousOxide_conc)) +
+    geom_boxplot() +
+    labs(title = paste("Box Plot of NO2 vs. Binary Target"))
+
+ggplot(numeric_predictors, aes(x = Dangerous, y = NitrousOxide_conc)) +
+    geom_violin() +
+    labs(title = paste("Violin Plot ofNO2 vs. Binary Target"))
+
+ggplot(numeric_predictors, aes(x = NitrousOxide_conc, fill = Dangerous)) +
+    geom_histogram(binwidth = 0.04, position = "identity", alpha = 0.5) +
+    labs(title = paste("Histogram of NO2 by Binary Target"))
 
 ```
 
 
-```{r}
-
-```
 
 
 ```{r}
 
-```
 
 
-```{r}
 
-```
-
-
-```{r}
-
-```
-
-
-```{r}
-
-```
-
-
-```{r}
-
-```
-
-
-```{r}
-
-```
-
-
-```{r}
 
 ```
 
