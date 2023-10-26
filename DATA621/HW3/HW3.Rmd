@@ -14,49 +14,6 @@ output:
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-# Appendix
 ```{r include=FALSE}
 library(tidyverse)
 library(readxl)
@@ -72,9 +29,15 @@ library(knitr)
 library(pROC)
 library(caret)
 library(psych)
+library(ROCR)
 set.seed(1234)
 ```
 
+
+
+
+
+# DATA EXPLORATION
 ```{r}
 trainraw <- read_csv('https://raw.githubusercontent.com/kglan/MSDS/main/DATA621/HW3/crime-training-data_modified.csv', col_names = TRUE)
 testraw <- read_csv('https://raw.githubusercontent.com/kglan/MSDS/main/DATA621/HW3/crime-evaluation-data_modified.csv',col_names=TRUE) 
@@ -107,6 +70,7 @@ sapply(trainraw, class)
 sapply(testraw, class)
 ```
 
+# DATA PREPARATION
 
 ```{r}
 train <- trainraw%>%
@@ -183,51 +147,194 @@ ggplot(numeric_predictors, aes(x = NitrousOxide_conc, fill = Dangerous)) +
 ```
 
 
+# Build Models
 
+```{r, fig.height=10, fig.width=10}
+set.seed(124)  # For reproducibility
+sample_indices <- sample(1:nrow(train), size = 140)  # Choose an appropriate size
+validation_data <- train[sample_indices, ]
+```
 
 ```{r}
 
+main_train_data <- train[-sample_indices, ]  # Exclude the validation subset
+log_model <- train(Dangerous ~ ., data = main_train_data, method = "glm", family = binomial(link = "logit"))
+```
 
 
+```{r}
+validation_predictions <- predict(log_model, newdata = validation_data, type = "raw")
+```
+
+
+```{r}
+conf_matrix <- confusionMatrix(validation_predictions, validation_data$Dangerous)
+conf_matrix
+```
+
+
+```{r}
+roc(main_train_data$Dangerous, as.vector(fitted.values(log_model)), percent=T,   boot.n=1000, ci.alpha=0.9, stratified=FALSE, plot=TRUE, xlab="False Positive %", ylab="True Positive %")
+```
+
+
+```{r}
+log_model2 <- train(Dangerous ~ Industrial_zone + NitrousOxide_conc + OwnerOccupiedUnits + tax , data = main_train_data, method = "glm", family = binomial(link = "logit"))
+```
+
+
+
+
+```{r}
+validation_predictions2 <- predict(log_model2, newdata = validation_data, type = "raw")
+conf_matrix2 <- confusionMatrix(validation_predictions2, validation_data$Dangerous)
+conf_matrix2
+```
+
+
+```{r}
+roc(main_train_data$Dangerous, as.vector(fitted.values(log_model2)), percent=T,   boot.n=1000, ci.alpha=0.9, stratified=FALSE, plot=TRUE, xlab="False Positive %", ylab="True Positive %")
 
 
 ```
 
 
+
 ```{r}
+# Extract the numeric variables from your dataset
+numeric_data <- main_train_data[, numeric_vars_list]
+
+# Scale the numeric variables
+scaled_data <- scale(numeric_data)
+
+# Replace the original numeric variables with the scaled values
+main_train_data[, numeric_vars_list] <- scaled_data
+
+
+
+
+
+#Validation data
+numeric_datav <- validation_data[, numeric_vars_list]
+
+# Scale the numeric variables
+scaled_datav <- scale(numeric_datav)
+
+# Replace the original numeric variables with the scaled values
+validation_data[, numeric_vars_list] <- scaled_datav
+```
+
+
+
+```{r}
+# Define the names of the variables to one-hot encode
+categorical_vars_list <- c("Charles_River_border", "Highway_Index")
+
+# Create one-hot encoded variables
+one_hot_encoded <- model.matrix(~ . - 1, data = main_train_data[, categorical_vars_list])
+
+# Add the one-hot encoded variables to the original dataset
+main_train_data <- cbind(main_train_data, one_hot_encoded)
+
+# Remove the original categorical variables
+main_train_data <- main_train_data[, !names(main_train_data) %in% categorical_vars_list]
+```
+
+
+
+```{r}
+
+
+#Validation data
+# Create one-hot encoded variables
+one_hot_encodedv <- model.matrix(~ . - 1, data = validation_data[, categorical_vars_list])
+
+# Add the one-hot encoded variables to the original dataset
+validation_data <- cbind(validation_data, one_hot_encodedv)
+
+# Remove the original categorical variables
+validation_data <- validation_data[, !names(validation_data) %in% categorical_vars_list]
 
 ```
 
 
-```{r}
 
+```{r}
+# Test rescaled model
+log_model3 <- train(Dangerous ~ . , data = main_train_data, method = "glm", family = binomial(link = "logit"))
+```
+
+
+
+
+```{r}
+validation_predictions3 <- predict(log_model3, newdata = validation_data, type = "raw")
+conf_matrix3 <- confusionMatrix(validation_predictions3, validation_data$Dangerous)
+conf_matrix3
 ```
 
 
 ```{r}
-
+roc(main_train_data$Dangerous, as.vector(fitted.values(log_model3)), percent=T,   boot.n=1000, ci.alpha=0.9, stratified=FALSE, plot=TRUE, xlab="False Positive %", ylab="True Positive %")
 ```
+
+
+
+# SELECT MODELS
+Predicting on the given test data, I wanted to chose a model that was accurate 
+but didnt seem to be overfitted. The way I accomplished this was by scaling
+the numerical variables and one-hot encoding the categorical variables. The test
+set provided didnt have values I could use for the prediction ROC and AUC curve 
+so I instead subsetted the training data.
+
+```{r}
+# Extract the numeric variables from your dataset
+numeric_datat <- test[, numeric_vars_list]
+
+# Scale the numeric variables
+scaled_datat <- scale(numeric_datat)
+
+# Replace the original numeric variables with the scaled values
+test[, numeric_vars_list] <- scaled_datat
+#Validation data
+# Create one-hot encoded variables
+one_hot_encodedt <- model.matrix(~ . - 1, data = test[, categorical_vars_list])
+
+# Add the one-hot encoded variables to the original dataset
+test <- cbind(test, one_hot_encodedt)
+
+# Remove the original categorical variables
+test <- test[, !names(test) %in% categorical_vars_list]
+```
+
+
+
 
 
 ```{r}
-
+test_predictionst <- predict(log_model3, newdata = test, type = "raw")
 ```
+
+
 
 
 ```{r}
-
+test_predictionst<- as.data.frame(test_predictionst)
 ```
+
+
 
 
 ```{r}
-
+test <- cbind(test, test_predictionst)
 ```
+
+
 
 
 ```{r}
-
+head(test)
 ```
-
 
 
 
